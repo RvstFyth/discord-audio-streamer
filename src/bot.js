@@ -1,5 +1,5 @@
 const { Client, GatewayIntentBits, Events } = require('discord.js');
-const { createAudioPlayer, createAudioResource, joinVoiceChannel, NoSubscriberBehavior} = require('@discordjs/voice');
+const { createAudioPlayer, createAudioResource, joinVoiceChannel, NoSubscriberBehavior, VoiceConnectionStatus} = require('@discordjs/voice');
 const config = require('./config.json');
 
 const bot = new Client({
@@ -47,6 +47,9 @@ bot.on(Events.ClientReady, async () => {
                     channelId: channel.id,
                     guildId: channel.guild.id,
                     adapterCreator: channel.guild.voiceAdapterCreator
+                });
+                connection.on(VoiceConnectionStatus.Ready, () => {
+                    console.log(`Joined voice channel ${channel.name} in ${channel.guild.name} guild`);
                 });
                 connection.subscribe(audioPlayer);
                 connections[channel.id] = connection;
