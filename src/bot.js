@@ -1,5 +1,5 @@
 const { Client, GatewayIntentBits, Events } = require('discord.js');
-const { createAudioPlayer, createAudioResource, joinVoiceChannel, NoSubscriberBehavior, VoiceConnectionStatus} = require('@discordjs/voice');
+const { createAudioPlayer, createAudioResource, joinVoiceChannel, NoSubscriberBehavior, VoiceConnectionStatus, AudioPlayerStatus} = require('@discordjs/voice');
 const config = require('./config.json');
 
 const bot = new Client({
@@ -19,6 +19,18 @@ const audioPlayer = createAudioPlayer({
 });
 
 audioPlayer.play(resource);
+audioPlayer.on(AudioPlayerStatus.Playing, () => {
+    console.log(`AudioPlayer: started playing`);
+});
+audioPlayer.on(AudioPlayerStatus.Buffering, () => {
+    console.log(`AudioPlayer: entered state Buffering`)
+});
+audioPlayer.on(AudioPlayerStatus.Idle, () => {
+    console.log(`AudioPlayer: entered state idle`)
+});
+audioPlayer.on('error', error => {
+    console.error(`AudioPlayer: Error.. ${error.message}`);
+});
 
 const validateConfig = () => {
     const keys = ['discord_token', 'channel_id', 'stream_url'];
@@ -49,7 +61,10 @@ bot.on(Events.ClientReady, async () => {
                     adapterCreator: channel.guild.voiceAdapterCreator
                 });
                 connection.on(VoiceConnectionStatus.Ready, () => {
-                    console.log(`Joined voice channel ${channel.name} in ${channel.guild.name} guild`);
+                    console.log(`Connected to voice channel ${channel.name} in ${channel.guild.name} guild`);
+                });
+                connection.on(VoiceConnectionStatus.Disconnected, () => {
+                   console.log(`Disconnected from voice channel ${channel.name} in ${channel.guild.name} guild`);
                 });
                 connection.subscribe(audioPlayer);
                 connections[channel.id] = connection;
