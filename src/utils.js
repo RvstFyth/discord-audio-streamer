@@ -63,7 +63,8 @@ const getVoiceConnection = (channel) => {
         console.log(`Connected to voice channel ${channel.name} in ${channel.guild.name} guild`);
     });
     connection.on(VoiceConnectionStatus.Disconnected, () => {
-        console.log(`Disconnected from voice channel ${channel.name} in ${channel.guild.name} guild`);
+        console.log(`Disconnected from voice channel ${channel.name} in ${channel.guild.name} guild.`);
+        connection.rejoin();
     });
 
     return connection;
